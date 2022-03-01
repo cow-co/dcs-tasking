@@ -6,12 +6,12 @@ import java.util.List;
 import org.springframework.web.bind.annotation.GetMapping;
 import org.springframework.web.bind.annotation.RestController;
 
-import cowco.tasking.taskingbackend.rest.resourcerepresentation.TaskingDAO;
+import cowco.tasking.taskingbackend.db.TaskingEntity;
 
 @RestController
 public class TaskingController {
     @GetMapping("/api/v1/taskings")
-    public List<TaskingDAO> getTaskings() {
-        return new ArrayList<TaskingDAO>();
+    public List<TaskingEntity> getTaskings() {
+        return new ArrayList<TaskingEntity>();
     }
 }
