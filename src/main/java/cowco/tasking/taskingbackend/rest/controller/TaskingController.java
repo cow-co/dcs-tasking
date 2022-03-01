@@ -17,6 +17,8 @@ public class TaskingController {
 
     @GetMapping("/api/v1/taskings")
     public List<TaskingEntity> getTaskings() {
-        return new ArrayList<TaskingEntity>();
+        List<TaskingEntity> taskings = new ArrayList<>();
+        taskingRepository.findAll().forEach(taskings::add);
+        return taskings;
     }
 }
