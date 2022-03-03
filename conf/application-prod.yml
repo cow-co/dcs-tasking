@@ -1,12 +1,4 @@
-# Default to using an in-memory DB
 spring:
-  datasource:
-    driverClassName: org.h2.Driver
-    url: jdbc:h2:mem:test;MODE=PostgreSQL
-
----
-spring:
-  profiles: prod
   datasource:
     url: ${JDBC_DATABASE_URL}
     username: ${JDBC_DATABASE_USERNAME}
