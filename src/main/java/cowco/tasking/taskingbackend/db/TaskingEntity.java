@@ -5,6 +5,7 @@ import javax.persistence.GeneratedValue;
 import javax.persistence.GenerationType;
 import javax.persistence.Id;
 import cowco.tasking.taskingbackend.common.TaskingType;
+import cowco.tasking.taskingbackend.rest.requests.TaskingRequest;
 
 @Entity
 public class TaskingEntity {
@@ -15,10 +16,16 @@ public class TaskingEntity {
     private String location;
     private TaskingType type;
 
+    public TaskingEntity() {
+    }
+
     public TaskingEntity(String summary, String location, TaskingType type) {
         this.summary = summary;
         this.location = location;
         this.type = type;
     }
 
+    public void fromTaskingRequest(TaskingRequest taskingRequest) {
+        this.summary = taskingRequest.getSummary();
+    }
 }
