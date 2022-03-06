@@ -7,6 +7,12 @@ public class TaskingRequest {
     private String location;
     private TaskingType type;
 
+    public TaskingRequest(String summary, String location, TaskingType type) {
+        this.summary = summary;
+        this.location = location;
+        this.type = type;
+    }
+
     public String getSummary() {
         return summary;
     }

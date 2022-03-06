@@ -7,9 +7,14 @@ import org.springframework.boot.test.context.SpringBootTest;
 import org.springframework.test.context.ActiveProfiles;
 import org.springframework.test.web.servlet.MockMvc;
 
+import cowco.tasking.taskingbackend.common.TaskingType;
+import cowco.tasking.taskingbackend.rest.requests.TaskingRequest;
+
 import static org.springframework.test.web.servlet.request.MockMvcRequestBuilders.get;
+import static org.springframework.test.web.servlet.request.MockMvcRequestBuilders.put;
 import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.status;
 import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.content;
+import static org.hamcrest.core.StringContains.containsString;
 
 @ActiveProfiles(profiles = { "test" })
 @SpringBootTest
@@ -24,12 +29,9 @@ public class TaskingControllerTests {
     }
 
     @Test
-    public void testGetsPopulatedList() {
-
-    }
-
-    @Test
-    public void testCreatesSuccessfully() {
-
+    public void testCreatesSuccessfully() throws Exception {
+        TaskingRequest request = new TaskingRequest("Test Summary", "Test Location", TaskingType.CAP);
+        mockMvc.perform(put("/api/v1/taskings", request)).andExpect(status().is(201))
+                .andExpect(content().string(containsString("Test Summary")));
     }
 }
