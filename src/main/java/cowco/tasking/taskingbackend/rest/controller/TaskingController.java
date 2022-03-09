@@ -8,6 +8,7 @@ import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.GetMapping;
 import org.springframework.web.bind.annotation.PutMapping;
+import org.springframework.web.bind.annotation.RequestBody;
 import org.springframework.web.bind.annotation.RestController;
 
 import cowco.tasking.taskingbackend.db.TaskingEntity;
@@ -25,7 +26,7 @@ public class TaskingController {
      * 
      * @return The taskings that exist in the database
      */
-    @GetMapping("/api/v1/taskings")
+    @GetMapping(value = "/api/v1/taskings", produces = "application/json")
     public List<TaskingEntity> getTaskings() {
         List<TaskingEntity> taskings = new ArrayList<>();
         taskingRepository.findAll().forEach(taskings::add);
@@ -40,11 +41,13 @@ public class TaskingController {
      * @return A response containing either the created tasking, or details of an
      *         error
      */
-    @PutMapping("/api/v1/taskings")
-    public ResponseEntity<TaskingEntity> createTasking(TaskingRequest taskingRequest) {
+    @PutMapping(value = "/api/v1/taskings", consumes = "application/json", produces = "application/json")
+    public ResponseEntity<TaskingEntity> createTasking(@RequestBody TaskingRequest taskingRequest) {
         TaskingEntity entityToCreate = new TaskingEntity();
         entityToCreate.fromTaskingRequest(taskingRequest);
+        System.out.println(taskingRequest.getSummary());
         TaskingEntity createdTasking = taskingRepository.save(entityToCreate);
+        System.out.println(createdTasking.getSummary());
 
         return new ResponseEntity<TaskingEntity>(createdTasking, HttpStatus.CREATED);
     }

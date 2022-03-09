@@ -27,5 +27,23 @@ public class TaskingEntity {
 
     public void fromTaskingRequest(TaskingRequest taskingRequest) {
         this.summary = taskingRequest.getSummary();
+        this.location = taskingRequest.getLocation();
+        this.type = taskingRequest.getType();
+    }
+
+    public String getSummary() {
+        return summary;
+    }
+
+    public long getId() {
+        return id;
+    }
+
+    public String getLocation() {
+        return location;
+    }
+
+    public TaskingType getType() {
+        return type;
     }
 }
