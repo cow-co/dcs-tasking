@@ -65,7 +65,7 @@ public class TaskingController {
      */
     @PostMapping(value = "/api/v1/taskings", consumes = "application/json", produces = "application/json")
     public ResponseEntity<TaskingEntity> updateTasking(@RequestBody TaskingRequest taskingRequest) {
-        ResponseEntity<TaskingEntity> response = new ResponseEntity<>(null, HttpStatus.BAD_REQUEST);
+        ResponseEntity<TaskingEntity> response = new ResponseEntity<>(null, HttpStatus.NOT_FOUND);
         Optional<TaskingEntity> entityRecord = taskingRepository.findById(taskingRequest.getId());
 
         if (entityRecord.isPresent()) {

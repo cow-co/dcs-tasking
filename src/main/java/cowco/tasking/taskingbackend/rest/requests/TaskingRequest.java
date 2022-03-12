@@ -8,6 +8,10 @@ public class TaskingRequest {
     private String location;
     private TaskingType type;
 
+    public TaskingRequest() {
+
+    }
+
     public TaskingRequest(long id, String summary, String location, TaskingType type) {
         this.id = id;
         this.summary = summary;
