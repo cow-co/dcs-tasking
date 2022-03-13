@@ -85,7 +85,7 @@ public class TaskingController {
      * @param taskingId The ID of the tasking to be deleted
      * @return A response containing either a success message or details of an error
      */
-    @DeleteMapping(value = "/api/v1/taskings/{id}", produces = "application/json")
+    @DeleteMapping(value = "/api/v1/taskings/{taskingId}", produces = "application/json")
     public ResponseEntity<String> deleteTasking(@PathVariable long taskingId) {
         ResponseEntity<String> response = new ResponseEntity<>("Tasking not found", HttpStatus.NOT_FOUND);
         Optional<TaskingEntity> entityRecord = taskingRepository.findById(taskingId);
