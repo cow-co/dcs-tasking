@@ -41,7 +41,6 @@ public class TaskingController {
 
     /**
      * Creates a tasking based on the requested details.
-     * TODO Implement validation
      * 
      * @param taskingRequest The details of the tasking to be created
      * @return A response containing either the created tasking, or details of an
@@ -76,7 +75,6 @@ public class TaskingController {
 
     /**
      * Updates a tasking based on the requested details.
-     * TODO Implement validation
      * 
      * @param taskingRequest The details of the update to be made
      * @return A response containing either the updated tasking, or details of an
@@ -91,19 +89,19 @@ public class TaskingController {
         if (taskingRequest.getSummary() == null || taskingRequest.getSummary().trim().isEmpty()) {
             errors.add("Summary not populated!");
             status = HttpStatus.BAD_REQUEST;
-        }
-
-        Optional<TaskingEntity> entityRecord = taskingRepository.findById(taskingRequest.getId());
-
-        if (entityRecord.isPresent()) {
-            TaskingEntity entityToUpdate = entityRecord.get();
-            entityToUpdate.fromTaskingRequest(taskingRequest);
-            TaskingEntity updatedTasking = taskingRepository.save(entityToUpdate);
-            status = HttpStatus.OK;
-            responseData.put("tasking", updatedTasking);
         } else {
-            errors.add("Tasking with ID " + taskingRequest.getId() + " was not found!");
-            status = HttpStatus.NOT_FOUND;
+            Optional<TaskingEntity> entityRecord = taskingRepository.findById(taskingRequest.getId());
+
+            if (entityRecord.isPresent()) {
+                TaskingEntity entityToUpdate = entityRecord.get();
+                entityToUpdate.fromTaskingRequest(taskingRequest);
+                TaskingEntity updatedTasking = taskingRepository.save(entityToUpdate);
+                status = HttpStatus.OK;
+                responseData.put("tasking", updatedTasking);
+            } else {
+                errors.add("Tasking with ID " + taskingRequest.getId() + " was not found!");
+                status = HttpStatus.NOT_FOUND;
+            }
         }
 
         responseData.put("errors", errors);

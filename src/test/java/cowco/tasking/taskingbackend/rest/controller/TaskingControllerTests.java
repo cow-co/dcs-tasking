@@ -21,10 +21,12 @@ import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.
 
 import com.jayway.jsonpath.JsonPath;
 
+import org.json.JSONArray;
 import org.json.JSONObject;
 
 import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.content;
 import static org.hamcrest.core.StringContains.containsString;
+import static org.junit.jupiter.api.Assertions.assertTrue;
 
 @ActiveProfiles(profiles = { "test" })
 @SpringBootTest
@@ -76,6 +78,61 @@ public class TaskingControllerTests {
     }
 
     @Test
+    public void testFailsToCreateNoSummary() throws Exception {
+        JSONObject taskingJson = new JSONObject();
+        taskingJson.put("summary", null);
+        taskingJson.put("location", "Test Location");
+        taskingJson.put("type", TaskingType.SEAD);
+        MvcResult response = mockMvc.perform(put("/api/v1/taskings").content(taskingJson.toString())
+                .contentType(MediaType.APPLICATION_JSON))
+                .andExpect(status().is(400)).andReturn();
+
+        JSONObject json = new JSONObject(response.getResponse().getContentAsString());
+        JSONArray errors = json.getJSONArray("errors");
+        assertTrue(errors.length() == 1);
+    }
+
+    @Test
+    public void testFailsToCreateEmptySummary() throws Exception {
+        JSONObject taskingJson = new JSONObject();
+        taskingJson.put("summary", "     ");
+        taskingJson.put("location", "Test Location");
+        taskingJson.put("type", TaskingType.SEAD);
+        MvcResult response = mockMvc.perform(put("/api/v1/taskings").content(taskingJson.toString())
+                .contentType(MediaType.APPLICATION_JSON))
+                .andExpect(status().is(400)).andReturn();
+
+        JSONObject json = new JSONObject(response.getResponse().getContentAsString());
+        JSONArray errors = json.getJSONArray("errors");
+        assertTrue(errors.length() == 1);
+    }
+
+    @Test
+    public void testFailsToCreateAlreadyExists() throws Exception {
+        JSONObject taskingJson = new JSONObject();
+        taskingJson.put("summary", "Test Summary");
+        taskingJson.put("location", "Test Location");
+        taskingJson.put("type", TaskingType.CAP);
+        MvcResult created = mockMvc.perform(put("/api/v1/taskings").content(taskingJson.toString())
+                .contentType(MediaType.APPLICATION_JSON)).andReturn();
+
+        long id = ((Number) JsonPath.read(created.getResponse().getContentAsString(), "tasking.id")).longValue();
+
+        JSONObject updatedJson = new JSONObject();
+        updatedJson.put("id", id);
+        updatedJson.put("summary", "Test Summary 2");
+        updatedJson.put("location", "Test Location");
+        updatedJson.put("type", TaskingType.SEAD);
+        MvcResult response = mockMvc.perform(put("/api/v1/taskings").content(updatedJson.toString())
+                .contentType(MediaType.APPLICATION_JSON))
+                .andExpect(status().is(400)).andReturn();
+
+        JSONObject json = new JSONObject(response.getResponse().getContentAsString());
+        JSONArray errors = json.getJSONArray("errors");
+        assertTrue(errors.length() == 1);
+    }
+
+    @Test
     public void testUpdatesSuccessfully() throws Exception {
         JSONObject taskingJson = new JSONObject();
         taskingJson.put("summary", "Test Summary");
@@ -84,7 +141,7 @@ public class TaskingControllerTests {
         MvcResult created = mockMvc.perform(put("/api/v1/taskings").content(taskingJson.toString())
                 .contentType(MediaType.APPLICATION_JSON)).andReturn();
 
-        long id = ((Number) JsonPath.read(created.getResponse().getContentAsString(), "$.id")).longValue();
+        long id = ((Number) JsonPath.read(created.getResponse().getContentAsString(), "tasking.id")).longValue();
 
         JSONObject updatedJson = new JSONObject();
         updatedJson.put("id", id);
@@ -100,6 +157,56 @@ public class TaskingControllerTests {
     }
 
     @Test
+    public void testFailsToUpdateNoSummary() throws Exception {
+        JSONObject taskingJson = new JSONObject();
+        taskingJson.put("summary", "Test Summary");
+        taskingJson.put("location", "Test Location");
+        taskingJson.put("type", TaskingType.CAP);
+        MvcResult created = mockMvc.perform(put("/api/v1/taskings").content(taskingJson.toString())
+                .contentType(MediaType.APPLICATION_JSON)).andReturn();
+
+        long id = ((Number) JsonPath.read(created.getResponse().getContentAsString(), "tasking.id")).longValue();
+
+        JSONObject updatedJson = new JSONObject();
+        updatedJson.put("id", id);
+        updatedJson.put("summary", null);
+        updatedJson.put("location", "Test Location");
+        updatedJson.put("type", TaskingType.SEAD);
+        MvcResult response = mockMvc.perform(post("/api/v1/taskings").content(updatedJson.toString())
+                .contentType(MediaType.APPLICATION_JSON))
+                .andExpect(status().is(400)).andReturn();
+
+        JSONObject json = new JSONObject(response.getResponse().getContentAsString());
+        JSONArray errors = json.getJSONArray("errors");
+        assertTrue(errors.length() == 1);
+    }
+
+    @Test
+    public void testFailsToUpdateEmptySummary() throws Exception {
+        JSONObject taskingJson = new JSONObject();
+        taskingJson.put("summary", "Test Summary");
+        taskingJson.put("location", "Test Location");
+        taskingJson.put("type", TaskingType.CAP);
+        MvcResult created = mockMvc.perform(put("/api/v1/taskings").content(taskingJson.toString())
+                .contentType(MediaType.APPLICATION_JSON)).andReturn();
+
+        long id = ((Number) JsonPath.read(created.getResponse().getContentAsString(), "tasking.id")).longValue();
+
+        JSONObject updatedJson = new JSONObject();
+        updatedJson.put("id", id);
+        updatedJson.put("summary", "       ");
+        updatedJson.put("location", "Test Location");
+        updatedJson.put("type", TaskingType.SEAD);
+        MvcResult response = mockMvc.perform(post("/api/v1/taskings").content(updatedJson.toString())
+                .contentType(MediaType.APPLICATION_JSON))
+                .andExpect(status().is(400)).andReturn();
+
+        JSONObject json = new JSONObject(response.getResponse().getContentAsString());
+        JSONArray errors = json.getJSONArray("errors");
+        assertTrue(errors.length() == 1);
+    }
+
+    @Test
     public void testFailsToUpdateNotFound() throws Exception {
         JSONObject taskingJson = new JSONObject();
         taskingJson.put("summary", "Test Summary");
@@ -108,7 +215,7 @@ public class TaskingControllerTests {
         MvcResult created = mockMvc.perform(put("/api/v1/taskings").content(taskingJson.toString())
                 .contentType(MediaType.APPLICATION_JSON)).andReturn();
 
-        long id = ((Number) JsonPath.read(created.getResponse().getContentAsString(), "$.id")).longValue();
+        long id = ((Number) JsonPath.read(created.getResponse().getContentAsString(), "tasking.id")).longValue();
 
         JSONObject updatedJson = new JSONObject();
         updatedJson.put("id", id + 10);
@@ -128,7 +235,7 @@ public class TaskingControllerTests {
         MvcResult created = mockMvc.perform(put("/api/v1/taskings").content(taskingJson.toString())
                 .contentType(MediaType.APPLICATION_JSON)).andReturn();
 
-        long id = ((Number) JsonPath.read(created.getResponse().getContentAsString(), "$.id")).longValue();
+        long id = ((Number) JsonPath.read(created.getResponse().getContentAsString(), "tasking.id")).longValue();
         mockMvc.perform(delete("/api/v1/taskings/" + id)).andExpect(status().is(200));
     }
 
@@ -141,7 +248,7 @@ public class TaskingControllerTests {
         MvcResult created = mockMvc.perform(put("/api/v1/taskings").content(taskingJson.toString())
                 .contentType(MediaType.APPLICATION_JSON)).andReturn();
 
-        long id = ((Number) JsonPath.read(created.getResponse().getContentAsString(), "$.id")).longValue();
+        long id = ((Number) JsonPath.read(created.getResponse().getContentAsString(), "tasking.id")).longValue();
         mockMvc.perform(delete("/api/v1/taskings/" + (id + 10))).andExpect(status().is(404));
     }
 }
