@@ -13,12 +13,12 @@ import org.springframework.web.bind.annotation.PathVariable;
 import org.springframework.web.bind.annotation.PutMapping;
 import org.springframework.web.bind.annotation.PostMapping;
 import org.springframework.web.bind.annotation.RequestBody;
-import org.springframework.web.bind.annotation.RequestParam;
 import org.springframework.web.bind.annotation.RestController;
 
 import cowco.tasking.taskingbackend.db.TaskingEntity;
 import cowco.tasking.taskingbackend.db.TaskingRepository;
 import cowco.tasking.taskingbackend.rest.requests.TaskingRequest;
+import net.minidev.json.JSONObject;
 
 @RestController
 public class TaskingController {
@@ -47,13 +47,30 @@ public class TaskingController {
      *         error
      */
     @PutMapping(value = "/api/v1/taskings", consumes = "application/json", produces = "application/json")
-    public ResponseEntity<TaskingEntity> createTasking(@RequestBody TaskingRequest taskingRequest) {
-        // TODO Validation of: summary populated, ID does not already exist
-        TaskingEntity entityToCreate = new TaskingEntity();
-        entityToCreate.fromTaskingRequest(taskingRequest);
-        TaskingEntity createdTasking = taskingRepository.save(entityToCreate);
+    public ResponseEntity<JSONObject> createTasking(@RequestBody TaskingRequest taskingRequest) {
+        JSONObject responseData = new JSONObject();
+        List<String> errors = new ArrayList<>();
+        HttpStatus status = HttpStatus.BAD_REQUEST;
 
-        return new ResponseEntity<TaskingEntity>(createdTasking, HttpStatus.CREATED);
+        if (taskingRequest.getSummary() == null || taskingRequest.getSummary().trim().isEmpty()) {
+            errors.add("Summary not populated!");
+        }
+
+        if (taskingRepository.findById(taskingRequest.getId()).isPresent()) {
+            errors.add("Tasking with that ID already exists!");
+        }
+
+        if (errors.size() == 0) {
+            TaskingEntity entityToCreate = new TaskingEntity();
+            entityToCreate.fromTaskingRequest(taskingRequest);
+            TaskingEntity createdTasking = taskingRepository.save(entityToCreate);
+            responseData.put("tasking", createdTasking);
+            status = HttpStatus.CREATED;
+        } else {
+            responseData.put("errors", errors);
+        }
+
+        return new ResponseEntity<JSONObject>(responseData, status);
     }
 
     /**
