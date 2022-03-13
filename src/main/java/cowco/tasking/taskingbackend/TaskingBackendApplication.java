@@ -8,8 +8,8 @@ import org.springframework.data.jpa.repository.config.EnableJpaRepositories;
 @EnableJpaRepositories
 public class TaskingBackendApplication {
 
-	public static void main(String[] args) {
-		SpringApplication.run(TaskingBackendApplication.class, args);
-	}
+    public static void main(String[] args) {
+        SpringApplication.run(TaskingBackendApplication.class, args);
+    }
 
 }
