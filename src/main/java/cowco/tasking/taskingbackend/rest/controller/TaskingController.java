@@ -66,9 +66,9 @@ public class TaskingController {
             TaskingEntity createdTasking = taskingRepository.save(entityToCreate);
             responseData.put("tasking", createdTasking);
             status = HttpStatus.CREATED;
-        } else {
-            responseData.put("errors", errors);
         }
+
+        responseData.put("errors", errors);
 
         return new ResponseEntity<JSONObject>(responseData, status);
     }
@@ -82,18 +82,32 @@ public class TaskingController {
      *         error
      */
     @PostMapping(value = "/api/v1/taskings", consumes = "application/json", produces = "application/json")
-    public ResponseEntity<TaskingEntity> updateTasking(@RequestBody TaskingRequest taskingRequest) {
-        ResponseEntity<TaskingEntity> response = new ResponseEntity<>(null, HttpStatus.NOT_FOUND);
+    public ResponseEntity<JSONObject> updateTasking(@RequestBody TaskingRequest taskingRequest) {
+        JSONObject responseData = new JSONObject();
+        List<String> errors = new ArrayList<>();
+        HttpStatus status;
+
+        if (taskingRequest.getSummary() == null || taskingRequest.getSummary().trim().isEmpty()) {
+            errors.add("Summary not populated!");
+            status = HttpStatus.BAD_REQUEST;
+        }
+
         Optional<TaskingEntity> entityRecord = taskingRepository.findById(taskingRequest.getId());
 
         if (entityRecord.isPresent()) {
             TaskingEntity entityToUpdate = entityRecord.get();
             entityToUpdate.fromTaskingRequest(taskingRequest);
             TaskingEntity updatedTasking = taskingRepository.save(entityToUpdate);
-            response = new ResponseEntity<>(updatedTasking, HttpStatus.OK);
+            status = HttpStatus.OK;
+            responseData.put("tasking", updatedTasking);
+        } else {
+            errors.add("Tasking with ID " + taskingRequest.getId() + " was not found!");
+            status = HttpStatus.NOT_FOUND;
         }
 
-        return response;
+        responseData.put("errors", errors);
+
+        return new ResponseEntity<JSONObject>(responseData, status);
     }
 
     /**
