@@ -20,6 +20,7 @@ import cowco.tasking.taskingbackend.db.TaskingRepository;
 import cowco.tasking.taskingbackend.rest.requests.TaskingRequest;
 import net.minidev.json.JSONObject;
 
+// TODO Perhaps find a way to reduce the duplication in the response/error code? Make a Response class for this?
 @RestController
 public class TaskingController {
     @Autowired
@@ -117,15 +118,22 @@ public class TaskingController {
      * @return A response containing either a success message or details of an error
      */
     @DeleteMapping(value = "/api/v1/taskings/{taskingId}", produces = "application/json")
-    public ResponseEntity<String> deleteTasking(@PathVariable long taskingId) {
-        ResponseEntity<String> response = new ResponseEntity<>("Tasking not found", HttpStatus.NOT_FOUND);
+    public ResponseEntity<JSONObject> deleteTasking(@PathVariable long taskingId) {
+        JSONObject responseData = new JSONObject();
+        List<String> errors = new ArrayList<>();
+        HttpStatus status;
         Optional<TaskingEntity> entityRecord = taskingRepository.findById(taskingId);
 
         if (entityRecord.isPresent()) {
             taskingRepository.deleteById(taskingId);
-            response = new ResponseEntity<>("Successfully deleted tasking", HttpStatus.OK);
+            status = HttpStatus.OK;
+        } else {
+            errors.add("Tasking with ID " + taskingId + " was not found!");
+            status = HttpStatus.NOT_FOUND;
         }
 
-        return response;
+        responseData.put("errors", errors);
+
+        return new ResponseEntity<JSONObject>(responseData, status);
     }
 }
