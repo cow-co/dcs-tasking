@@ -91,16 +91,14 @@ public class TaskingController {
             @RequestBody TaskingRequest taskingRequest) {
         JSONObject responseData = new JSONObject();
         List<String> errors = new ArrayList<>();
-        HttpStatus status;
+        HttpStatus status = HttpStatus.BAD_REQUEST;
 
         if (taskingRequest.getSummary() == null || taskingRequest.getSummary().trim().isEmpty()) {
             errors.add("Summary not populated!");
-            status = HttpStatus.BAD_REQUEST;
         }
 
         if (taskingRequest.getServerName() == null || taskingRequest.getServerName().trim().isEmpty()) {
             errors.add("Server name not populated!");
-            status = HttpStatus.BAD_REQUEST;
         }
 
         if (errors.size() == 0) {
