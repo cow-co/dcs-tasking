@@ -17,14 +17,12 @@ import cowco.tasking.taskingbackend.db.TaskingRepository;
 public class ServersCache {
     @Autowired
     private TaskingRepository taskingRepository;
-    private boolean initialised = false;
     private Set<String> servers = new HashSet<>();
 
     public void initialise() {
         for (TaskingEntity tasking : taskingRepository.findAll()) {
             servers.add(tasking.getServerName());
         }
-        this.initialised = true;
     }
 
     /**
@@ -36,10 +34,6 @@ public class ServersCache {
      */
     public void addServer(String server) {
         servers.add(server);
-    }
-
-    public boolean isInitialised() {
-        return initialised;
     }
 
     public Set<String> getServers() {

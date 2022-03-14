@@ -59,10 +59,17 @@ public class TaskingController {
             errors.add("Summary not populated!");
         }
 
+        if (taskingRequest.getServerName() == null || taskingRequest.getServerName().trim().isEmpty()) {
+            errors.add("Server name not populated!");
+            status = HttpStatus.BAD_REQUEST;
+        }
+
         if (errors.size() == 0) {
             TaskingEntity entityToCreate = new TaskingEntity();
             entityToCreate.fromTaskingRequest(taskingRequest);
             TaskingEntity createdTasking = taskingRepository.save(entityToCreate);
+            serversCache.addServer(taskingRequest.getServerName());
+
             responseData.put("tasking", createdTasking);
             status = HttpStatus.CREATED;
         }
@@ -89,13 +96,22 @@ public class TaskingController {
         if (taskingRequest.getSummary() == null || taskingRequest.getSummary().trim().isEmpty()) {
             errors.add("Summary not populated!");
             status = HttpStatus.BAD_REQUEST;
-        } else {
+        }
+
+        if (taskingRequest.getServerName() == null || taskingRequest.getServerName().trim().isEmpty()) {
+            errors.add("Server name not populated!");
+            status = HttpStatus.BAD_REQUEST;
+        }
+
+        if (errors.size() == 0) {
             Optional<TaskingEntity> entityRecord = taskingRepository.findById(taskingId);
 
             if (entityRecord.isPresent()) {
                 TaskingEntity entityToUpdate = entityRecord.get();
                 entityToUpdate.fromTaskingRequest(taskingRequest);
                 TaskingEntity updatedTasking = taskingRepository.save(entityToUpdate);
+                serversCache.addServer(taskingRequest.getServerName());
+
                 status = HttpStatus.OK;
                 responseData.put("tasking", updatedTasking);
             } else {
@@ -144,10 +160,7 @@ public class TaskingController {
      */
     @GetMapping(value = "/api/v1/servers", produces = "application/json")
     public ResponseEntity<JSONObject> getServers() {
-        if (!serversCache.isInitialised()) {
-            serversCache.initialise();
-        }
-
+        serversCache.initialise();
         JSONObject responseData = new JSONObject();
         responseData.put("servers", serversCache.getServers());
         return new ResponseEntity<JSONObject>(responseData, HttpStatus.OK);
