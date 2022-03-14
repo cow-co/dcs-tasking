@@ -15,6 +15,7 @@ import org.springframework.web.bind.annotation.PostMapping;
 import org.springframework.web.bind.annotation.RequestBody;
 import org.springframework.web.bind.annotation.RestController;
 
+import cowco.tasking.taskingbackend.common.ServersCache;
 import cowco.tasking.taskingbackend.db.TaskingEntity;
 import cowco.tasking.taskingbackend.db.TaskingRepository;
 import cowco.tasking.taskingbackend.rest.requests.TaskingRequest;
@@ -25,6 +26,8 @@ import net.minidev.json.JSONObject;
 public class TaskingController {
     @Autowired
     private TaskingRepository taskingRepository;
+    @Autowired
+    private ServersCache serversCache;
 
     /**
      * Retrieves a list of the taskings in the database.
@@ -56,10 +59,6 @@ public class TaskingController {
             errors.add("Summary not populated!");
         }
 
-        if (taskingRepository.findById(taskingRequest.getId()).isPresent()) {
-            errors.add("Tasking with that ID already exists!");
-        }
-
         if (errors.size() == 0) {
             TaskingEntity entityToCreate = new TaskingEntity();
             entityToCreate.fromTaskingRequest(taskingRequest);
@@ -80,8 +79,9 @@ public class TaskingController {
      * @return A response containing either the updated tasking, or details of an
      *         error
      */
-    @PostMapping(value = "/api/v1/taskings", consumes = "application/json", produces = "application/json")
-    public ResponseEntity<JSONObject> updateTasking(@RequestBody TaskingRequest taskingRequest) {
+    @PostMapping(value = "/api/v1/taskings/{taskingId}", consumes = "application/json", produces = "application/json")
+    public ResponseEntity<JSONObject> updateTasking(@PathVariable long taskingId,
+            @RequestBody TaskingRequest taskingRequest) {
         JSONObject responseData = new JSONObject();
         List<String> errors = new ArrayList<>();
         HttpStatus status;
@@ -90,7 +90,7 @@ public class TaskingController {
             errors.add("Summary not populated!");
             status = HttpStatus.BAD_REQUEST;
         } else {
-            Optional<TaskingEntity> entityRecord = taskingRepository.findById(taskingRequest.getId());
+            Optional<TaskingEntity> entityRecord = taskingRepository.findById(taskingId);
 
             if (entityRecord.isPresent()) {
                 TaskingEntity entityToUpdate = entityRecord.get();
@@ -99,7 +99,7 @@ public class TaskingController {
                 status = HttpStatus.OK;
                 responseData.put("tasking", updatedTasking);
             } else {
-                errors.add("Tasking with ID " + taskingRequest.getId() + " was not found!");
+                errors.add("Tasking with ID " + taskingId + " was not found!");
                 status = HttpStatus.NOT_FOUND;
             }
         }
@@ -133,5 +133,23 @@ public class TaskingController {
         responseData.put("errors", errors);
 
         return new ResponseEntity<JSONObject>(responseData, status);
+    }
+
+    /**
+     * Since I'm using free versions of database services, I'm going to be careful
+     * with how much data I store in the DB - so I won't have a separate "servers"
+     * table.
+     * Instead, I'll just create a list each time it's needed.
+     * Slightly janky, but cuts the risk of incurring costs.
+     */
+    @GetMapping(value = "/api/v1/servers", produces = "application/json")
+    public ResponseEntity<JSONObject> getServers() {
+        if (!serversCache.isInitialised()) {
+            serversCache.initialise();
+        }
+
+        JSONObject responseData = new JSONObject();
+        responseData.put("servers", serversCache.getServers());
+        return new ResponseEntity<JSONObject>(responseData, HttpStatus.OK);
     }
 }

@@ -14,20 +14,23 @@ public class TaskingEntity {
     private long id;
     private String summary;
     private String location;
+    private String serverName;
     private TaskingType type;
 
     public TaskingEntity() {
     }
 
-    public TaskingEntity(String summary, String location, TaskingType type) {
+    public TaskingEntity(String summary, String location, String serverName, TaskingType type) {
         this.summary = summary;
         this.location = location;
+        this.serverName = serverName;
         this.type = type;
     }
 
     public void fromTaskingRequest(TaskingRequest taskingRequest) {
         this.summary = taskingRequest.getSummary();
         this.location = taskingRequest.getLocation();
+        this.serverName = taskingRequest.getServerName();
         this.type = taskingRequest.getType();
     }
 
@@ -41,6 +44,10 @@ public class TaskingEntity {
 
     public String getLocation() {
         return location;
+    }
+
+    public String getServerName() {
+        return serverName;
     }
 
     public TaskingType getType() {
