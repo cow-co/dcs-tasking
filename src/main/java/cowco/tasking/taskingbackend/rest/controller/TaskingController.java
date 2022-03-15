@@ -141,8 +141,6 @@ public class TaskingController {
             TaskingEntity entityToUpdate = entityRecord.get();
             entityToUpdate.addTaskedPlayer(player);
             TaskingEntity updatedTasking = taskingRepository.save(entityToUpdate);
-            serversCache.addServer(taskingRequest.getServerName());
-
             status = HttpStatus.OK;
             responseData.put("tasking", updatedTasking);
         } else {

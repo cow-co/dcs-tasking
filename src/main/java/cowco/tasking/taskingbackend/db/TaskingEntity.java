@@ -3,6 +3,7 @@ package cowco.tasking.taskingbackend.db;
 import java.util.List;
 import java.util.Set;
 
+import javax.persistence.Convert;
 import javax.persistence.Entity;
 import javax.persistence.GeneratedValue;
 import javax.persistence.GenerationType;
@@ -18,6 +19,7 @@ public class TaskingEntity {
     private String summary;
     private String location;
     private String serverName;
+    @Convert(converter = StringSetConverter.class)
     private Set<String> taskedPlayers;
     private TaskingType type;
 
