@@ -363,16 +363,18 @@ public class TaskingControllerTests {
         MvcResult response = mockMvc.perform(post("/api/v1/taskings/" + id + "/player1")).andReturn();
 
         JSONObject json = new JSONObject(response.getResponse().getContentAsString());
-        JSONArray tasked = json.getJSONArray("tasking.taskedPlayers");
-        assertEquals(tasked.length(), 1);
+        JSONObject tasking = json.getJSONObject("tasking");
+        JSONArray tasked = tasking.getJSONArray("taskedPlayers");
+        assertEquals(1, tasked.length());
 
         response = mockMvc.perform(post("/api/v1/taskings/" + id + "/player2"))
                 .andExpect(content().string(containsString("player2")))
                 .andReturn();
 
         json = new JSONObject(response.getResponse().getContentAsString());
-        tasked = json.getJSONArray("tasking.taskedPlayers");
-        assertEquals(tasked.length(), 2);
+        tasking = json.getJSONObject("tasking");
+        tasked = tasking.getJSONArray("taskedPlayers");
+        assertEquals(2, tasked.length());
     }
 
     @Test
@@ -391,7 +393,8 @@ public class TaskingControllerTests {
         MvcResult response = mockMvc.perform(post("/api/v1/taskings/" + id + "/player1")).andReturn();
 
         JSONObject json = new JSONObject(response.getResponse().getContentAsString());
-        JSONArray tasked = json.getJSONArray("tasking.taskedPlayers");
-        assertEquals(tasked.length(), 1);
+        JSONObject tasking = json.getJSONObject("tasking");
+        JSONArray tasked = tasking.getJSONArray("taskedPlayers");
+        assertEquals(1, tasked.length());
     }
 }
