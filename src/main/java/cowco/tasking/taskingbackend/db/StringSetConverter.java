@@ -18,11 +18,12 @@ public class StringSetConverter implements AttributeConverter<Set<String>, Strin
 
     @Override
     public String convertToDatabaseColumn(Set<String> stringSet) {
-        return stringSet != null ? String.join(DELIMITER, stringSet) : "";
+        return (stringSet != null && !stringSet.isEmpty()) ? String.join(DELIMITER, stringSet) : "";
     }
 
     @Override
     public Set<String> convertToEntityAttribute(String string) {
-        return string != null ? new HashSet<>(Arrays.asList(string.split(DELIMITER))) : new HashSet<>();
+        return (string != null && !string.isBlank()) ? new HashSet<>(Arrays.asList(string.split(DELIMITER)))
+                : new HashSet<>();
     }
 }
