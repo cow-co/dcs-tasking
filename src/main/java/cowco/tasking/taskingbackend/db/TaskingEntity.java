@@ -72,6 +72,10 @@ public class TaskingEntity {
         taskedPlayers.add(player);
     }
 
+    public void removeTaskedPlayer(String player) {
+        taskedPlayers.remove(player);
+    }
+
     public TaskingType getType() {
         return type;
     }
