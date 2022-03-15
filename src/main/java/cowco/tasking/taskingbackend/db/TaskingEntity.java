@@ -1,5 +1,8 @@
 package cowco.tasking.taskingbackend.db;
 
+import java.util.List;
+import java.util.Set;
+
 import javax.persistence.Entity;
 import javax.persistence.GeneratedValue;
 import javax.persistence.GenerationType;
@@ -15,15 +18,18 @@ public class TaskingEntity {
     private String summary;
     private String location;
     private String serverName;
+    private Set<String> taskedPlayers;
     private TaskingType type;
 
     public TaskingEntity() {
     }
 
-    public TaskingEntity(String summary, String location, String serverName, TaskingType type) {
+    public TaskingEntity(String summary, String location, String serverName, Set<String> taskedPlayers,
+            TaskingType type) {
         this.summary = summary;
         this.location = location;
         this.serverName = serverName;
+        this.taskedPlayers = taskedPlayers;
         this.type = type;
     }
 
@@ -31,6 +37,7 @@ public class TaskingEntity {
         this.summary = taskingRequest.getSummary();
         this.location = taskingRequest.getLocation();
         this.serverName = taskingRequest.getServerName();
+        this.taskedPlayers = taskingRequest.getTaskedPlayers();
         this.type = taskingRequest.getType();
     }
 
@@ -48,6 +55,19 @@ public class TaskingEntity {
 
     public String getServerName() {
         return serverName;
+    }
+
+    public Set<String> getTaskedPlayers() {
+        return taskedPlayers;
+    }
+
+    /**
+     * Adds a player to the tasked-list, if that player is not already tasked
+     * 
+     * @param player
+     */
+    public void addTaskedPlayer(String player) {
+        taskedPlayers.add(player);
     }
 
     public TaskingType getType() {
