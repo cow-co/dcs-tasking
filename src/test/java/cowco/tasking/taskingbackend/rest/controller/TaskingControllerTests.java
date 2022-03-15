@@ -360,24 +360,18 @@ public class TaskingControllerTests {
 
         long id = ((Number) JsonPath.read(created.getResponse().getContentAsString(), "tasking.id"))
                 .longValue();
-
-        JSONObject updatedJson = new JSONObject();
-        updatedJson.put("summary", "Test Summary");
-        updatedJson.put("location", "Test Location");
-        updatedJson.put("serverName", "Hoggit");
-        updatedJson.put("type", TaskingType.SEAD);
-        MvcResult response = mockMvc.perform(post("/api/v1/taskings/" + id + "/player1").content(updatedJson.toString())
-                .contentType(MediaType.APPLICATION_JSON)).andReturn();
+        MvcResult response = mockMvc.perform(post("/api/v1/taskings/" + id + "/player1")).andReturn();
 
         JSONObject json = new JSONObject(response.getResponse().getContentAsString());
-        JSONArray tasked = json.getJSONArray("taskedPlayers");
+        JSONArray tasked = json.getJSONArray("tasking.taskedPlayers");
         assertEquals(tasked.length(), 1);
 
-        response = mockMvc.perform(post("/api/v1/taskings/" + id + "/player2").content(updatedJson.toString())
-                .contentType(MediaType.APPLICATION_JSON)).andReturn();
+        response = mockMvc.perform(post("/api/v1/taskings/" + id + "/player2"))
+                .andExpect(content().string(containsString("player2")))
+                .andReturn();
 
         json = new JSONObject(response.getResponse().getContentAsString());
-        tasked = json.getJSONArray("taskedPlayers");
+        tasked = json.getJSONArray("tasking.taskedPlayers");
         assertEquals(tasked.length(), 2);
     }
 
@@ -393,30 +387,11 @@ public class TaskingControllerTests {
 
         long id = ((Number) JsonPath.read(created.getResponse().getContentAsString(), "tasking.id"))
                 .longValue();
-
-        JSONObject updatedJson = new JSONObject();
-        updatedJson.put("summary", "Test Summary");
-        updatedJson.put("location", "Test Location");
-        updatedJson.put("serverName", "Hoggit");
-        updatedJson.put("type", TaskingType.SEAD);
-        mockMvc.perform(post("/api/v1/taskings/" + id + "/player1").content(updatedJson.toString())
-                .contentType(MediaType.APPLICATION_JSON))
-                .andExpect(status().is(200))
-                .andExpect(content().string(containsString("Test Summary")))
-                .andExpect(content().string(containsString("Test Location")))
-                .andExpect(content().string(containsString("SEAD")));
-
-        MvcResult response = mockMvc
-                .perform(post("/api/v1/taskings/" + id + "/player1").content(updatedJson.toString())
-                        .contentType(MediaType.APPLICATION_JSON))
-                .andExpect(status().is(200))
-                .andExpect(content().string(containsString("Test Summary")))
-                .andExpect(content().string(containsString("Test Location")))
-                .andExpect(content().string(containsString("SEAD")))
-                .andReturn();
+        mockMvc.perform(post("/api/v1/taskings/" + id + "/player1"));
+        MvcResult response = mockMvc.perform(post("/api/v1/taskings/" + id + "/player1")).andReturn();
 
         JSONObject json = new JSONObject(response.getResponse().getContentAsString());
-        JSONArray tasked = json.getJSONArray("taskedPlayers");
+        JSONArray tasked = json.getJSONArray("tasking.taskedPlayers");
         assertEquals(tasked.length(), 1);
     }
 }

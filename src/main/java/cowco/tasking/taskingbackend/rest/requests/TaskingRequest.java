@@ -24,6 +24,14 @@ public class TaskingRequest {
         this.type = type;
     }
 
+    public TaskingRequest(String summary, String location, String serverName,
+            TaskingType type) {
+        this.summary = summary;
+        this.location = location;
+        this.serverName = serverName;
+        this.type = type;
+    }
+
     public String getSummary() {
         return summary;
     }
