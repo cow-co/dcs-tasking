@@ -8,24 +8,13 @@ public class TaskingRequest {
     private String summary;
     private String location;
     private String serverName;
-    private Set<String> taskedPlayers;
     private TaskingType type;
 
     public TaskingRequest() {
 
     }
 
-    public TaskingRequest(String summary, String location, String serverName, Set<String> taskedPlayers,
-            TaskingType type) {
-        this.summary = summary;
-        this.location = location;
-        this.serverName = serverName;
-        this.taskedPlayers = taskedPlayers;
-        this.type = type;
-    }
-
-    public TaskingRequest(String summary, String location, String serverName,
-            TaskingType type) {
+    public TaskingRequest(String summary, String location, String serverName, TaskingType type) {
         this.summary = summary;
         this.location = location;
         this.serverName = serverName;
@@ -42,10 +31,6 @@ public class TaskingRequest {
 
     public String getServerName() {
         return serverName;
-    }
-
-    public Set<String> getTaskedPlayers() {
-        return taskedPlayers;
     }
 
     public TaskingType getType() {
