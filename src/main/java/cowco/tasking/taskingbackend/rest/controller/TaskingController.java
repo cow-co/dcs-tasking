@@ -130,7 +130,7 @@ public class TaskingController {
      * @return A response containing either the updated tasking, or details of an
      *         error
      */
-    @PostMapping(value = "/api/v1/taskings/{taskingId}/{player}", produces = "application/json")
+    @PostMapping(value = "/api/v1/taskings/{taskingId}/assign/{player}", produces = "application/json")
     public ResponseEntity<JSONObject> taskPlayer(@PathVariable long taskingId, @PathVariable String player) {
         JSONObject responseData = new JSONObject();
         List<String> errors = new ArrayList<>();
@@ -140,6 +140,36 @@ public class TaskingController {
         if (entityRecord.isPresent()) {
             TaskingEntity entityToUpdate = entityRecord.get();
             entityToUpdate.addTaskedPlayer(player);
+            TaskingEntity updatedTasking = taskingRepository.save(entityToUpdate);
+            status = HttpStatus.OK;
+            responseData.put("tasking", updatedTasking);
+        } else {
+            errors.add("Tasking with ID " + taskingId + " was not found!");
+            status = HttpStatus.NOT_FOUND;
+        }
+
+        responseData.put("errors", errors);
+
+        return new ResponseEntity<JSONObject>(responseData, status);
+    }
+
+    /**
+     * Updates a tasking based on the requested details.
+     * 
+     * @param taskingRequest The details of the update to be made
+     * @return A response containing either the updated tasking, or details of an
+     *         error
+     */
+    @PostMapping(value = "/api/v1/taskings/{taskingId}/unassign/{player}", produces = "application/json")
+    public ResponseEntity<JSONObject> untaskPlayer(@PathVariable long taskingId, @PathVariable String player) {
+        JSONObject responseData = new JSONObject();
+        List<String> errors = new ArrayList<>();
+        HttpStatus status = HttpStatus.BAD_REQUEST;
+        Optional<TaskingEntity> entityRecord = taskingRepository.findById(taskingId);
+
+        if (entityRecord.isPresent()) {
+            TaskingEntity entityToUpdate = entityRecord.get();
+            entityToUpdate.removeTaskedPlayer(player);
             TaskingEntity updatedTasking = taskingRepository.save(entityToUpdate);
             status = HttpStatus.OK;
             responseData.put("tasking", updatedTasking);
