@@ -44,18 +44,11 @@ public class TaskingControllerTests {
 
     @Test
     public void testGetsPopulatedTaskingsList() throws Exception {
-        JSONObject taskingJson = new JSONObject();
-        taskingJson.put("summary", "Test Summary");
-        taskingJson.put("location", "Test Location");
-        taskingJson.put("serverName", "Hoggit");
-        taskingJson.put("type", TaskingType.CAP);
+        JSONObject taskingJson = generateTaskingJson();
         mockMvc.perform(put("/api/v1/taskings").content(taskingJson.toString())
                 .contentType(MediaType.APPLICATION_JSON));
 
-        taskingJson = new JSONObject();
-        taskingJson.put("summary", "Test Summary 2");
         taskingJson.put("location", "Test Location 2");
-        taskingJson.put("serverName", "Hoggit");
         taskingJson.put("type", TaskingType.SEAD);
         mockMvc.perform(put("/api/v1/taskings").content(taskingJson.toString())
                 .contentType(MediaType.APPLICATION_JSON));
@@ -68,19 +61,11 @@ public class TaskingControllerTests {
 
     @Test
     public void testGetsPopulatedServersList() throws Exception {
-        JSONObject taskingJson = new JSONObject();
-        taskingJson.put("summary", "Test Summary");
-        taskingJson.put("location", "Test Location");
-        taskingJson.put("serverName", "Hoggit");
-        taskingJson.put("type", TaskingType.CAP);
+        JSONObject taskingJson = generateTaskingJson();
         mockMvc.perform(put("/api/v1/taskings").content(taskingJson.toString())
                 .contentType(MediaType.APPLICATION_JSON));
 
-        taskingJson = new JSONObject();
-        taskingJson.put("summary", "Test Summary 2");
-        taskingJson.put("location", "Test Location 2");
         taskingJson.put("serverName", "4YA");
-        taskingJson.put("type", TaskingType.SEAD);
         mockMvc.perform(put("/api/v1/taskings").content(taskingJson.toString())
                 .contentType(MediaType.APPLICATION_JSON));
 
@@ -95,27 +80,15 @@ public class TaskingControllerTests {
 
     @Test
     public void testGetsPopulatedServersListWithDuplicate() throws Exception {
-        JSONObject taskingJson = new JSONObject();
-        taskingJson.put("summary", "Test Summary");
-        taskingJson.put("location", "Test Location");
-        taskingJson.put("serverName", "Hoggit");
-        taskingJson.put("type", TaskingType.CAP);
+        JSONObject taskingJson = generateTaskingJson();
         mockMvc.perform(put("/api/v1/taskings").content(taskingJson.toString())
                 .contentType(MediaType.APPLICATION_JSON));
 
-        taskingJson = new JSONObject();
-        taskingJson.put("summary", "Test Summary 2");
-        taskingJson.put("location", "Test Location 2");
         taskingJson.put("serverName", "4YA");
-        taskingJson.put("type", TaskingType.SEAD);
         mockMvc.perform(put("/api/v1/taskings").content(taskingJson.toString())
                 .contentType(MediaType.APPLICATION_JSON));
 
-        taskingJson = new JSONObject();
-        taskingJson.put("summary", "Test Summary 3");
-        taskingJson.put("location", "Test Location 3");
         taskingJson.put("serverName", "4YA");
-        taskingJson.put("type", TaskingType.SEAD);
         mockMvc.perform(put("/api/v1/taskings").content(taskingJson.toString())
                 .contentType(MediaType.APPLICATION_JSON));
 
@@ -128,11 +101,7 @@ public class TaskingControllerTests {
 
     @Test
     public void testCreatesSuccessfully() throws Exception {
-        JSONObject taskingJson = new JSONObject();
-        taskingJson.put("summary", "Test Summary");
-        taskingJson.put("location", "Test Location");
-        taskingJson.put("serverName", "Hoggit");
-        taskingJson.put("type", TaskingType.CAP);
+        JSONObject taskingJson = generateTaskingJson();
         mockMvc.perform(put("/api/v1/taskings").content(taskingJson.toString())
                 .contentType(MediaType.APPLICATION_JSON))
                 .andExpect(status().is(201))
@@ -143,71 +112,47 @@ public class TaskingControllerTests {
 
     @Test
     public void testFailsToCreateNoSummary() throws Exception {
-        JSONObject taskingJson = new JSONObject();
+        JSONObject taskingJson = generateTaskingJson();
         taskingJson.put("summary", null);
-        taskingJson.put("location", "Test Location");
-        taskingJson.put("serverName", "Hoggit");
-        taskingJson.put("type", TaskingType.SEAD);
         MvcResult response = mockMvc.perform(put("/api/v1/taskings").content(taskingJson.toString())
                 .contentType(MediaType.APPLICATION_JSON))
                 .andExpect(status().is(400)).andReturn();
-
-        JSONObject json = new JSONObject(response.getResponse().getContentAsString());
-        JSONArray errors = json.getJSONArray("errors");
-        assertEquals(errors.length(), 1);
+        assertTrue(isErrorsLengthCorrect(response, 1));
     }
 
     @Test
     public void testFailsToCreateEmptySummary() throws Exception {
-        JSONObject taskingJson = new JSONObject();
+        JSONObject taskingJson = generateTaskingJson();
         taskingJson.put("summary", "     ");
-        taskingJson.put("location", "Test Location");
-        taskingJson.put("serverName", "Hoggit");
-        taskingJson.put("type", TaskingType.SEAD);
         MvcResult response = mockMvc.perform(put("/api/v1/taskings").content(taskingJson.toString())
                 .contentType(MediaType.APPLICATION_JSON))
                 .andExpect(status().is(400)).andReturn();
-
-        JSONObject json = new JSONObject(response.getResponse().getContentAsString());
-        JSONArray errors = json.getJSONArray("errors");
-        assertEquals(errors.length(), 1);
+        assertTrue(isErrorsLengthCorrect(response, 1));
     }
 
     @Test
     public void testFailsToCreateEmptyServerName() throws Exception {
-        JSONObject taskingJson = new JSONObject();
-        taskingJson.put("summary", "Test Summary 2");
-        taskingJson.put("location", "Test Location");
+        JSONObject taskingJson = generateTaskingJson();
         taskingJson.put("serverName", "  ");
-        taskingJson.put("type", TaskingType.SEAD);
         MvcResult response = mockMvc.perform(put("/api/v1/taskings").content(taskingJson.toString())
                 .contentType(MediaType.APPLICATION_JSON))
                 .andExpect(status().is(400)).andReturn();
-
-        JSONObject json = new JSONObject(response.getResponse().getContentAsString());
-        JSONArray errors = json.getJSONArray("errors");
-        assertEquals(errors.length(), 1);
+        assertTrue(isErrorsLengthCorrect(response, 1));
     }
 
     @Test
     public void testUpdatesSuccessfully() throws Exception {
-        JSONObject taskingJson = new JSONObject();
-        taskingJson.put("summary", "Test Summary");
-        taskingJson.put("location", "Test Location");
-        taskingJson.put("serverName", "Hoggit");
-        taskingJson.put("type", TaskingType.CAP);
+        JSONObject taskingJson = generateTaskingJson();
         MvcResult created = mockMvc.perform(put("/api/v1/taskings").content(taskingJson.toString())
                 .contentType(MediaType.APPLICATION_JSON)).andReturn();
 
         long id = ((Number) JsonPath.read(created.getResponse().getContentAsString(), "tasking.id"))
                 .longValue();
 
-        JSONObject updatedJson = new JSONObject();
-        updatedJson.put("summary", "Test Summary");
-        updatedJson.put("location", "Test Location");
-        updatedJson.put("serverName", "Hoggit");
-        updatedJson.put("type", TaskingType.SEAD);
-        mockMvc.perform(post("/api/v1/taskings/" + id).content(updatedJson.toString())
+        taskingJson.put("summary", "Test Summary");
+        taskingJson.put("location", "Test Location");
+        taskingJson.put("type", TaskingType.SEAD);
+        mockMvc.perform(post("/api/v1/taskings/" + id).content(taskingJson.toString())
                 .contentType(MediaType.APPLICATION_JSON))
                 .andExpect(status().is(200))
                 .andExpect(content().string(containsString("Test Summary")))
@@ -217,114 +162,68 @@ public class TaskingControllerTests {
 
     @Test
     public void testFailsToUpdateNoSummary() throws Exception {
-        JSONObject taskingJson = new JSONObject();
-        taskingJson.put("summary", "Test Summary");
-        taskingJson.put("location", "Test Location");
-        taskingJson.put("serverName", "Hoggit");
-        taskingJson.put("type", TaskingType.CAP);
+        JSONObject taskingJson = generateTaskingJson();
         MvcResult created = mockMvc.perform(put("/api/v1/taskings").content(taskingJson.toString())
                 .contentType(MediaType.APPLICATION_JSON)).andReturn();
 
         long id = ((Number) JsonPath.read(created.getResponse().getContentAsString(), "tasking.id"))
                 .longValue();
 
-        JSONObject updatedJson = new JSONObject();
-        updatedJson.put("summary", null);
-        updatedJson.put("location", "Test Location");
-        updatedJson.put("serverName", "Hoggit");
-        updatedJson.put("type", TaskingType.SEAD);
-        MvcResult response = mockMvc.perform(post("/api/v1/taskings/" + id).content(updatedJson.toString())
+        taskingJson.put("summary", null);
+        MvcResult response = mockMvc.perform(post("/api/v1/taskings/" + id).content(taskingJson.toString())
                 .contentType(MediaType.APPLICATION_JSON))
                 .andExpect(status().is(400)).andReturn();
-
-        JSONObject json = new JSONObject(response.getResponse().getContentAsString());
-        JSONArray errors = json.getJSONArray("errors");
-        assertEquals(errors.length(), 1);
+        assertTrue(isErrorsLengthCorrect(response, 1));
     }
 
     @Test
     public void testFailsToUpdateEmptySummary() throws Exception {
-        JSONObject taskingJson = new JSONObject();
-        taskingJson.put("summary", "Test Summary");
-        taskingJson.put("location", "Test Location");
-        taskingJson.put("serverName", "Hoggit");
-        taskingJson.put("type", TaskingType.CAP);
+        JSONObject taskingJson = generateTaskingJson();
         MvcResult created = mockMvc.perform(put("/api/v1/taskings").content(taskingJson.toString())
                 .contentType(MediaType.APPLICATION_JSON)).andReturn();
 
         long id = ((Number) JsonPath.read(created.getResponse().getContentAsString(), "tasking.id"))
                 .longValue();
 
-        JSONObject updatedJson = new JSONObject();
-        updatedJson.put("summary", "       ");
-        updatedJson.put("location", "Test Location");
-        updatedJson.put("serverName", "Hoggit");
-        updatedJson.put("type", TaskingType.SEAD);
-        MvcResult response = mockMvc.perform(post("/api/v1/taskings/" + id).content(updatedJson.toString())
+        taskingJson.put("summary", "       ");
+        MvcResult response = mockMvc.perform(post("/api/v1/taskings/" + id).content(taskingJson.toString())
                 .contentType(MediaType.APPLICATION_JSON))
                 .andExpect(status().is(400)).andReturn();
-
-        JSONObject json = new JSONObject(response.getResponse().getContentAsString());
-        JSONArray errors = json.getJSONArray("errors");
-        assertEquals(errors.length(), 1);
+        assertTrue(isErrorsLengthCorrect(response, 1));
     }
 
     @Test
     public void testFailsToUpdateEmptyServerName() throws Exception {
-        JSONObject taskingJson = new JSONObject();
-        taskingJson.put("summary", "Test Summary");
-        taskingJson.put("location", "Test Location");
-        taskingJson.put("serverName", "Hoggit");
-        taskingJson.put("type", TaskingType.CAP);
+        JSONObject taskingJson = generateTaskingJson();
         MvcResult created = mockMvc.perform(put("/api/v1/taskings").content(taskingJson.toString())
                 .contentType(MediaType.APPLICATION_JSON)).andReturn();
 
         long id = ((Number) JsonPath.read(created.getResponse().getContentAsString(), "tasking.id"))
                 .longValue();
 
-        JSONObject updatedJson = new JSONObject();
-        updatedJson.put("summary", "Test Summary 2");
-        updatedJson.put("location", "Test Location");
-        updatedJson.put("serverName", "  ");
-        updatedJson.put("type", TaskingType.SEAD);
-        MvcResult response = mockMvc.perform(post("/api/v1/taskings/" + id).content(updatedJson.toString())
+        taskingJson.put("serverName", "  ");
+        MvcResult response = mockMvc.perform(post("/api/v1/taskings/" + id).content(taskingJson.toString())
                 .contentType(MediaType.APPLICATION_JSON))
                 .andExpect(status().is(400)).andReturn();
-
-        JSONObject json = new JSONObject(response.getResponse().getContentAsString());
-        JSONArray errors = json.getJSONArray("errors");
-        assertEquals(errors.length(), 1);
+        assertTrue(isErrorsLengthCorrect(response, 1));
     }
 
     @Test
     public void testFailsToUpdateNotFound() throws Exception {
-        JSONObject taskingJson = new JSONObject();
-        taskingJson.put("summary", "Test Summary");
-        taskingJson.put("location", "Test Location");
-        taskingJson.put("serverName", "Hoggit");
-        taskingJson.put("type", TaskingType.CAP);
+        JSONObject taskingJson = generateTaskingJson();
         MvcResult created = mockMvc.perform(put("/api/v1/taskings").content(taskingJson.toString())
                 .contentType(MediaType.APPLICATION_JSON)).andReturn();
 
         long id = ((Number) JsonPath.read(created.getResponse().getContentAsString(), "tasking.id"))
                 .longValue();
 
-        JSONObject updatedJson = new JSONObject();
-        updatedJson.put("summary", "Test Summary");
-        updatedJson.put("location", "Test Location");
-        updatedJson.put("serverName", "Hoggit");
-        updatedJson.put("type", TaskingType.SEAD);
-        mockMvc.perform(post("/api/v1/taskings/" + (id + 10)).content(updatedJson.toString())
+        mockMvc.perform(post("/api/v1/taskings/" + (id + 10)).content(taskingJson.toString())
                 .contentType(MediaType.APPLICATION_JSON)).andExpect(status().is(404));
     }
 
     @Test
     public void testDeletesSuccessfully() throws Exception {
-        JSONObject taskingJson = new JSONObject();
-        taskingJson.put("summary", "Test Summary");
-        taskingJson.put("location", "Test Location");
-        taskingJson.put("serverName", "Hoggit");
-        taskingJson.put("type", TaskingType.CAP);
+        JSONObject taskingJson = generateTaskingJson();
         MvcResult created = mockMvc.perform(put("/api/v1/taskings").content(taskingJson.toString())
                 .contentType(MediaType.APPLICATION_JSON)).andReturn();
 
@@ -350,11 +249,7 @@ public class TaskingControllerTests {
 
     @Test
     public void testAssignsUser() throws Exception {
-        JSONObject taskingJson = new JSONObject();
-        taskingJson.put("summary", "Test Summary");
-        taskingJson.put("location", "Test Location");
-        taskingJson.put("serverName", "Hoggit");
-        taskingJson.put("type", TaskingType.CAP);
+        JSONObject taskingJson = generateTaskingJson();
         MvcResult created = mockMvc.perform(put("/api/v1/taskings").content(taskingJson.toString())
                 .contentType(MediaType.APPLICATION_JSON)).andReturn();
 
@@ -366,8 +261,7 @@ public class TaskingControllerTests {
         assignment.put("aircraft", "F-16");
         MvcResult response = mockMvc.perform(post("/api/v1/taskings/" + id + "/assign").content(assignment.toString())
                 .contentType(MediaType.APPLICATION_JSON)).andReturn();
-        JSONObject json = new JSONObject(response.getResponse().getContentAsString());
-        JSONObject tasking = json.getJSONObject("tasking");
+        JSONObject tasking = retrieveTasking(response);
         JSONObject taskedSingle = tasking.getJSONObject("taskedPlayers");
         assertEquals(1, taskedSingle.length());
 
@@ -376,19 +270,14 @@ public class TaskingControllerTests {
         response = mockMvc.perform(post("/api/v1/taskings/" + id + "/assign").content(assignment.toString())
                 .contentType(MediaType.APPLICATION_JSON)).andReturn();
 
-        json = new JSONObject(response.getResponse().getContentAsString());
-        tasking = json.getJSONObject("tasking");
+        tasking = retrieveTasking(response);
         JSONObject taskedArray = tasking.getJSONObject("taskedPlayers");
         assertEquals(2, taskedArray.length());
     }
 
     @Test
     public void testAssignsUserDuplicate() throws Exception {
-        JSONObject taskingJson = new JSONObject();
-        taskingJson.put("summary", "Test Summary");
-        taskingJson.put("location", "Test Location");
-        taskingJson.put("serverName", "Hoggit");
-        taskingJson.put("type", TaskingType.CAP);
+        JSONObject taskingJson = generateTaskingJson();
         MvcResult created = mockMvc.perform(put("/api/v1/taskings").content(taskingJson.toString())
                 .contentType(MediaType.APPLICATION_JSON)).andReturn();
 
@@ -402,19 +291,14 @@ public class TaskingControllerTests {
                 .contentType(MediaType.APPLICATION_JSON));
         MvcResult response = mockMvc.perform(post("/api/v1/taskings/" + id + "/assign").content(assignment.toString())
                 .contentType(MediaType.APPLICATION_JSON)).andReturn();
-        JSONObject json = new JSONObject(response.getResponse().getContentAsString());
-        JSONObject tasking = json.getJSONObject("tasking");
+        JSONObject tasking = retrieveTasking(response);
         JSONObject tasked = tasking.getJSONObject("taskedPlayers");
         assertEquals(1, tasked.length());
     }
 
     @Test
     public void testUnassignsUser() throws Exception {
-        JSONObject taskingJson = new JSONObject();
-        taskingJson.put("summary", "Test Summary");
-        taskingJson.put("location", "Test Location");
-        taskingJson.put("serverName", "Hoggit");
-        taskingJson.put("type", TaskingType.CAP);
+        JSONObject taskingJson = generateTaskingJson();
         MvcResult created = mockMvc.perform(put("/api/v1/taskings").content(taskingJson.toString())
                 .contentType(MediaType.APPLICATION_JSON)).andReturn();
 
@@ -427,19 +311,14 @@ public class TaskingControllerTests {
         mockMvc.perform(post("/api/v1/taskings/" + id + "/assign").content(assignment.toString())
                 .contentType(MediaType.APPLICATION_JSON));
         MvcResult response = mockMvc.perform(post("/api/v1/taskings/" + id + "/unassign/player1")).andReturn();
-        JSONObject json = new JSONObject(response.getResponse().getContentAsString());
-        JSONObject tasking = json.getJSONObject("tasking");
+        JSONObject tasking = retrieveTasking(response);
         JSONObject tasked = tasking.getJSONObject("taskedPlayers");
         assertEquals(0, tasked.length());
     }
 
     @Test
     public void testUnassignsNonassignedUser() throws Exception {
-        JSONObject taskingJson = new JSONObject();
-        taskingJson.put("summary", "Test Summary");
-        taskingJson.put("location", "Test Location");
-        taskingJson.put("serverName", "Hoggit");
-        taskingJson.put("type", TaskingType.CAP);
+        JSONObject taskingJson = generateTaskingJson();
         MvcResult created = mockMvc.perform(put("/api/v1/taskings").content(taskingJson.toString())
                 .contentType(MediaType.APPLICATION_JSON)).andReturn();
 
@@ -455,10 +334,28 @@ public class TaskingControllerTests {
                 .andReturn();
 
         response = mockMvc.perform(post("/api/v1/taskings/" + id + "/unassign/player2")).andReturn();
-
-        JSONObject json = new JSONObject(response.getResponse().getContentAsString());
-        JSONObject tasking = json.getJSONObject("tasking");
+        JSONObject tasking = retrieveTasking(response);
         JSONObject tasked = tasking.getJSONObject("taskedPlayers");
         assertEquals(1, tasked.length());
+    }
+
+    private JSONObject generateTaskingJson() {
+        JSONObject taskingJson = new JSONObject();
+        taskingJson.put("summary", "Test Summary");
+        taskingJson.put("location", "Test Location");
+        taskingJson.put("serverName", "Hoggit");
+        taskingJson.put("type", TaskingType.CAP);
+        return taskingJson;
+    }
+
+    private JSONObject retrieveTasking(MvcResult response) {
+        JSONObject json = new JSONObject(response.getResponse().getContentAsString());
+        return json.getJSONObject("tasking");
+    }
+
+    private boolean isErrorsLengthCorrect(MvcResult response, int expectedNumErrors) {
+        JSONObject json = new JSONObject(response.getResponse().getContentAsString());
+        JSONArray errors = json.getJSONArray("errors");
+        return errors.length() == expectedNumErrors;
     }
 }
