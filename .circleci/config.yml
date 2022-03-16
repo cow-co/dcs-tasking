@@ -10,8 +10,8 @@ orbs:
 workflows:
   maven_test:
     jobs:
-      test:
-        steps:
-          - maven/test:
-          - store_artifacts:
-              path: target
+      - test:
+          steps:
+            - maven/test:
+            - store_artifacts:
+                path: target
