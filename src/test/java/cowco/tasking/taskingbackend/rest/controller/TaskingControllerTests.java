@@ -424,11 +424,9 @@ public class TaskingControllerTests {
         JSONObject assignment = new JSONObject();
         assignment.put("player", "player1");
         assignment.put("aircraft", "F-16");
-        MvcResult response = mockMvc.perform(post("/api/v1/taskings/" + id + "/assign").content(assignment.toString())
-                .contentType(MediaType.APPLICATION_JSON)).andReturn();
-
-        response = mockMvc.perform(post("/api/v1/taskings/" + id + "/unassign/player1")).andReturn();
-
+        mockMvc.perform(post("/api/v1/taskings/" + id + "/assign").content(assignment.toString())
+                .contentType(MediaType.APPLICATION_JSON));
+        MvcResult response = mockMvc.perform(post("/api/v1/taskings/" + id + "/unassign/player1")).andReturn();
         JSONObject json = new JSONObject(response.getResponse().getContentAsString());
         JSONObject tasking = json.getJSONObject("tasking");
         JSONObject tasked = tasking.getJSONObject("taskedPlayers");
