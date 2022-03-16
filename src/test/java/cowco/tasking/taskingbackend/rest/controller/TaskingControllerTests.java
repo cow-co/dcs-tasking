@@ -19,9 +19,12 @@ import static org.springframework.test.web.servlet.request.MockMvcRequestBuilder
 import static org.springframework.test.web.servlet.request.MockMvcRequestBuilders.delete;
 import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.status;
 
+import java.io.UnsupportedEncodingException;
+
 import com.jayway.jsonpath.JsonPath;
 
 import org.json.JSONArray;
+import org.json.JSONException;
 import org.json.JSONObject;
 
 import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.content;
@@ -259,8 +262,10 @@ public class TaskingControllerTests {
         JSONObject assignment = new JSONObject();
         assignment.put("player", "player1");
         assignment.put("aircraft", "F-16");
-        MvcResult response = mockMvc.perform(post("/api/v1/taskings/" + id + "/assign").content(assignment.toString())
-                .contentType(MediaType.APPLICATION_JSON)).andReturn();
+        MvcResult response = mockMvc
+                .perform(post("/api/v1/taskings/" + id + "/assign").content(assignment.toString())
+                        .contentType(MediaType.APPLICATION_JSON))
+                .andReturn();
         JSONObject tasking = retrieveTasking(response);
         JSONObject taskedSingle = tasking.getJSONObject("taskedPlayers");
         assertEquals(1, taskedSingle.length());
@@ -289,8 +294,10 @@ public class TaskingControllerTests {
         assignment.put("aircraft", "F-16");
         mockMvc.perform(post("/api/v1/taskings/" + id + "/assign").content(assignment.toString())
                 .contentType(MediaType.APPLICATION_JSON));
-        MvcResult response = mockMvc.perform(post("/api/v1/taskings/" + id + "/assign").content(assignment.toString())
-                .contentType(MediaType.APPLICATION_JSON)).andReturn();
+        MvcResult response = mockMvc
+                .perform(post("/api/v1/taskings/" + id + "/assign").content(assignment.toString())
+                        .contentType(MediaType.APPLICATION_JSON))
+                .andReturn();
         JSONObject tasking = retrieveTasking(response);
         JSONObject tasked = tasking.getJSONObject("taskedPlayers");
         assertEquals(1, tasked.length());
@@ -339,7 +346,7 @@ public class TaskingControllerTests {
         assertEquals(1, tasked.length());
     }
 
-    private JSONObject generateTaskingJson() {
+    private JSONObject generateTaskingJson() throws JSONException, UnsupportedEncodingException {
         JSONObject taskingJson = new JSONObject();
         taskingJson.put("summary", "Test Summary");
         taskingJson.put("location", "Test Location");
@@ -348,12 +355,13 @@ public class TaskingControllerTests {
         return taskingJson;
     }
 
-    private JSONObject retrieveTasking(MvcResult response) {
+    private JSONObject retrieveTasking(MvcResult response) throws JSONException, UnsupportedEncodingException {
         JSONObject json = new JSONObject(response.getResponse().getContentAsString());
         return json.getJSONObject("tasking");
     }
 
-    private boolean isErrorsLengthCorrect(MvcResult response, int expectedNumErrors) {
+    private boolean isErrorsLengthCorrect(MvcResult response, int expectedNumErrors)
+            throws JSONException, UnsupportedEncodingException {
         JSONObject json = new JSONObject(response.getResponse().getContentAsString());
         JSONArray errors = json.getJSONArray("errors");
         return errors.length() == expectedNumErrors;
