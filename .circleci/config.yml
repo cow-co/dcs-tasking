@@ -12,6 +12,6 @@ workflows:
     jobs:
       - maven_test:
           steps:
-            - maven/test:
-            - store_test_results:
-                path: target/my-reports
+          - maven/test:
+          - store_test_results:
+              path: target/my-reports
