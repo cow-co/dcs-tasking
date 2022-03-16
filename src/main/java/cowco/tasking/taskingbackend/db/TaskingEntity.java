@@ -17,6 +17,7 @@ import javax.persistence.MapKeyColumn;
 import javax.persistence.Table;
 
 import cowco.tasking.taskingbackend.common.TaskingType;
+import cowco.tasking.taskingbackend.rest.requests.AssignmentRequest;
 import cowco.tasking.taskingbackend.rest.requests.TaskingRequest;
 
 @Entity
@@ -81,8 +82,8 @@ public class TaskingEntity {
      * Adds a player and their aircraft to the tasked-list, if that player is not
      * already tasked
      */
-    public void addTaskedPlayer(String player, String aircraft) {
-        assignments.put(player, aircraft);
+    public void addTaskedPlayer(AssignmentRequest assignment) {
+        assignments.put(assignment.getPlayer(), assignment.getAircraft());
     }
 
     public void removeTaskedPlayer(String player) {
