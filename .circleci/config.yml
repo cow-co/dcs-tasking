@@ -4,7 +4,6 @@ version: 2.1
 
 orbs:
   maven: circleci/maven@1.2.0
-  codecov: codecov/codecov@3.2.2
 
 # Invoke jobs via workflows
 # See: https://circleci.com/docs/2.0/configuration-reference/#workflows
@@ -12,5 +11,5 @@ workflows:
   maven_test:
     jobs:
       - maven/test:
-          post-steps:
-            - codecov/upload
+      - store_artifacts:
+          path: target
