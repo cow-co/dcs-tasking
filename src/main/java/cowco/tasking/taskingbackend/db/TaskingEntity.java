@@ -1,37 +1,53 @@
 package cowco.tasking.taskingbackend.db;
 
 import java.util.List;
+import java.util.Map;
 import java.util.Set;
 
+import javax.persistence.CollectionTable;
+import javax.persistence.Column;
 import javax.persistence.Convert;
+import javax.persistence.ElementCollection;
 import javax.persistence.Entity;
 import javax.persistence.GeneratedValue;
 import javax.persistence.GenerationType;
 import javax.persistence.Id;
+import javax.persistence.JoinColumn;
+import javax.persistence.MapKeyColumn;
+import javax.persistence.Table;
+
 import cowco.tasking.taskingbackend.common.TaskingType;
+import cowco.tasking.taskingbackend.rest.requests.AssignmentRequest;
 import cowco.tasking.taskingbackend.rest.requests.TaskingRequest;
 
 @Entity
+@Table(name = "taskings")
 public class TaskingEntity {
     @GeneratedValue(strategy = GenerationType.AUTO)
     @Id
+    @Column(name = "id")
     private long id;
     private String summary;
     private String location;
     private String serverName;
-    @Convert(converter = StringSetConverter.class)
-    private Set<String> taskedPlayers;
+
+    @ElementCollection
+    @CollectionTable(name = "tasking_assignment_mapping", joinColumns = {
+            @JoinColumn(name = "tasking_id", referencedColumnName = "id") })
+    @MapKeyColumn(name = "player_name")
+    @Column(name = "assignment")
+    private Map<String, String> assignments;
     private TaskingType type;
 
     public TaskingEntity() {
     }
 
-    public TaskingEntity(String summary, String location, String serverName, Set<String> taskedPlayers,
+    public TaskingEntity(String summary, String location, String serverName, Map<String, String> taskedPlayers,
             TaskingType type) {
         this.summary = summary;
         this.location = location;
         this.serverName = serverName;
-        this.taskedPlayers = taskedPlayers;
+        this.assignments = taskedPlayers;
         this.type = type;
     }
 
@@ -39,7 +55,6 @@ public class TaskingEntity {
         this.summary = taskingRequest.getSummary();
         this.location = taskingRequest.getLocation();
         this.serverName = taskingRequest.getServerName();
-        this.taskedPlayers = taskingRequest.getTaskedPlayers();
         this.type = taskingRequest.getType();
     }
 
@@ -59,21 +74,20 @@ public class TaskingEntity {
         return serverName;
     }
 
-    public Set<String> getTaskedPlayers() {
-        return taskedPlayers;
+    public Map<String, String> getTaskedPlayers() {
+        return assignments;
     }
 
     /**
-     * Adds a player to the tasked-list, if that player is not already tasked
-     * 
-     * @param player
+     * Adds a player and their aircraft to the tasked-list, if that player is not
+     * already tasked
      */
-    public void addTaskedPlayer(String player) {
-        taskedPlayers.add(player);
+    public void addTaskedPlayer(AssignmentRequest assignment) {
+        assignments.put(assignment.getPlayer(), assignment.getAircraft());
     }
 
     public void removeTaskedPlayer(String player) {
-        taskedPlayers.remove(player);
+        assignments.remove(player);
     }
 
     public TaskingType getType() {

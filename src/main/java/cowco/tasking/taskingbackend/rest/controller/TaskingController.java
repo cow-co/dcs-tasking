@@ -18,6 +18,7 @@ import org.springframework.web.bind.annotation.RestController;
 import cowco.tasking.taskingbackend.common.ServersCache;
 import cowco.tasking.taskingbackend.db.TaskingEntity;
 import cowco.tasking.taskingbackend.db.TaskingRepository;
+import cowco.tasking.taskingbackend.rest.requests.AssignmentRequest;
 import cowco.tasking.taskingbackend.rest.requests.TaskingRequest;
 import net.minidev.json.JSONObject;
 
@@ -130,8 +131,9 @@ public class TaskingController {
      * @return A response containing either the updated tasking, or details of an
      *         error
      */
-    @PostMapping(value = "/api/v1/taskings/{taskingId}/assign/{player}", produces = "application/json")
-    public ResponseEntity<JSONObject> taskPlayer(@PathVariable long taskingId, @PathVariable String player) {
+    @PostMapping(value = "/api/v1/taskings/{taskingId}/assign", produces = "application/json")
+    public ResponseEntity<JSONObject> taskPlayer(@PathVariable long taskingId,
+            @RequestBody AssignmentRequest assignmentRequest) {
         JSONObject responseData = new JSONObject();
         List<String> errors = new ArrayList<>();
         HttpStatus status = HttpStatus.BAD_REQUEST;
@@ -139,7 +141,7 @@ public class TaskingController {
 
         if (entityRecord.isPresent()) {
             TaskingEntity entityToUpdate = entityRecord.get();
-            entityToUpdate.addTaskedPlayer(player);
+            entityToUpdate.addTaskedPlayer(assignmentRequest);
             TaskingEntity updatedTasking = taskingRepository.save(entityToUpdate);
             status = HttpStatus.OK;
             responseData.put("tasking", updatedTasking);
