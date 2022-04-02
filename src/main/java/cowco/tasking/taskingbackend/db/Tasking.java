@@ -21,8 +21,7 @@ import cowco.tasking.taskingbackend.rest.requests.AssignmentRequest;
 import cowco.tasking.taskingbackend.rest.requests.TaskingRequest;
 
 @Entity
-@Table(name = "taskings")
-public class TaskingEntity {
+public class Tasking {
     @GeneratedValue(strategy = GenerationType.AUTO)
     @Id
     @Column(name = "id")
