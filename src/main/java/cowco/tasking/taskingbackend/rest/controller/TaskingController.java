@@ -16,7 +16,7 @@ import org.springframework.web.bind.annotation.RequestBody;
 import org.springframework.web.bind.annotation.RestController;
 
 import cowco.tasking.taskingbackend.common.ServersCache;
-import cowco.tasking.taskingbackend.db.TaskingEntity;
+import cowco.tasking.taskingbackend.db.Tasking;
 import cowco.tasking.taskingbackend.db.TaskingRepository;
 import cowco.tasking.taskingbackend.rest.requests.AssignmentRequest;
 import cowco.tasking.taskingbackend.rest.requests.TaskingRequest;
@@ -37,8 +37,8 @@ public class TaskingController {
      * @return The taskings that exist in the database
      */
     @GetMapping(value = "/api/v1/taskings", produces = "application/json")
-    public List<TaskingEntity> getTaskings() {
-        List<TaskingEntity> taskings = new ArrayList<>();
+    public List<Tasking> getTaskings() {
+        List<Tasking> taskings = new ArrayList<>();
         taskingRepository.findAll().forEach(taskings::add);
         return taskings;
     }
@@ -66,9 +66,9 @@ public class TaskingController {
         }
 
         if (errors.size() == 0) {
-            TaskingEntity entityToCreate = new TaskingEntity();
+            Tasking entityToCreate = new Tasking();
             entityToCreate.fromTaskingRequest(taskingRequest);
-            TaskingEntity createdTasking = taskingRepository.save(entityToCreate);
+            Tasking createdTasking = taskingRepository.save(entityToCreate);
             serversCache.addServer(taskingRequest.getServerName());
 
             responseData.put("tasking", createdTasking);
@@ -103,12 +103,12 @@ public class TaskingController {
         }
 
         if (errors.size() == 0) {
-            Optional<TaskingEntity> entityRecord = taskingRepository.findById(taskingId);
+            Optional<Tasking> entityRecord = taskingRepository.findById(taskingId);
 
             if (entityRecord.isPresent()) {
-                TaskingEntity entityToUpdate = entityRecord.get();
+                Tasking entityToUpdate = entityRecord.get();
                 entityToUpdate.fromTaskingRequest(taskingRequest);
-                TaskingEntity updatedTasking = taskingRepository.save(entityToUpdate);
+                Tasking updatedTasking = taskingRepository.save(entityToUpdate);
                 serversCache.addServer(taskingRequest.getServerName());
 
                 status = HttpStatus.OK;
@@ -137,12 +137,12 @@ public class TaskingController {
         JSONObject responseData = new JSONObject();
         List<String> errors = new ArrayList<>();
         HttpStatus status = HttpStatus.BAD_REQUEST;
-        Optional<TaskingEntity> entityRecord = taskingRepository.findById(taskingId);
+        Optional<Tasking> entityRecord = taskingRepository.findById(taskingId);
 
         if (entityRecord.isPresent()) {
-            TaskingEntity entityToUpdate = entityRecord.get();
+            Tasking entityToUpdate = entityRecord.get();
             entityToUpdate.addTaskedPlayer(assignmentRequest);
-            TaskingEntity updatedTasking = taskingRepository.save(entityToUpdate);
+            Tasking updatedTasking = taskingRepository.save(entityToUpdate);
             status = HttpStatus.OK;
             responseData.put("tasking", updatedTasking);
         } else {
@@ -167,12 +167,12 @@ public class TaskingController {
         JSONObject responseData = new JSONObject();
         List<String> errors = new ArrayList<>();
         HttpStatus status = HttpStatus.BAD_REQUEST;
-        Optional<TaskingEntity> entityRecord = taskingRepository.findById(taskingId);
+        Optional<Tasking> entityRecord = taskingRepository.findById(taskingId);
 
         if (entityRecord.isPresent()) {
-            TaskingEntity entityToUpdate = entityRecord.get();
+            Tasking entityToUpdate = entityRecord.get();
             entityToUpdate.removeTaskedPlayer(player);
-            TaskingEntity updatedTasking = taskingRepository.save(entityToUpdate);
+            Tasking updatedTasking = taskingRepository.save(entityToUpdate);
             status = HttpStatus.OK;
             responseData.put("tasking", updatedTasking);
         } else {
@@ -196,7 +196,7 @@ public class TaskingController {
         JSONObject responseData = new JSONObject();
         List<String> errors = new ArrayList<>();
         HttpStatus status;
-        Optional<TaskingEntity> entityRecord = taskingRepository.findById(taskingId);
+        Optional<Tasking> entityRecord = taskingRepository.findById(taskingId);
 
         if (entityRecord.isPresent()) {
             taskingRepository.deleteById(taskingId);
