@@ -6,7 +6,7 @@ import java.util.Set;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Component;
 
-import cowco.tasking.taskingbackend.db.TaskingEntity;
+import cowco.tasking.taskingbackend.db.Tasking;
 import cowco.tasking.taskingbackend.db.TaskingRepository;
 
 /**
@@ -20,7 +20,7 @@ public class ServersCache {
     private Set<String> servers = new HashSet<>();
 
     public void initialise() {
-        for (TaskingEntity tasking : taskingRepository.findAll()) {
+        for (Tasking tasking : taskingRepository.findAll()) {
             servers.add(tasking.getServerName());
         }
     }

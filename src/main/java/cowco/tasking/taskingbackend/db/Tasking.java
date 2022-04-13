@@ -38,10 +38,10 @@ public class Tasking {
     private Map<String, String> assignments;
     private TaskingType type;
 
-    public TaskingEntity() {
+    public Tasking() {
     }
 
-    public TaskingEntity(String summary, String location, String serverName, Map<String, String> taskedPlayers,
+    public Tasking(String summary, String location, String serverName, Map<String, String> taskedPlayers,
             TaskingType type) {
         this.summary = summary;
         this.location = location;
